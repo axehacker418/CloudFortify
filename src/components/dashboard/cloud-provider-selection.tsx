@@ -3,6 +3,7 @@
 import {useCallback, useState} from 'react';
 import {Card, CardContent, CardHeader, CardTitle} from '@/components/ui/card';
 import {Button} from '@/components/ui/button';
+import {CloudScanResults} from './cloud-scan-results';
 
 const cloudProviders = ['AWS', 'Azure', 'GCP'];
 
@@ -14,22 +15,24 @@ export const CloudProviderSelection = () => {
   }, []);
 
   return (
-    <Card className="w-full p-4">
-      <CardHeader>
-        <CardTitle>Select Cloud Provider</CardTitle>
-      </CardHeader>
-      <CardContent className="flex gap-4">
-        {cloudProviders.map((provider) => (
-          <Button
-            key={provider}
-            variant={selectedProvider === provider ? 'secondary' : 'outline'}
-            onClick={() => handleProviderSelect(provider)}
-          >
-            {provider}
-          </Button>
-        ))}
-      </CardContent>
-    </Card>
+    <>
+      <Card className="w-full p-4">
+        <CardHeader>
+          <CardTitle>Select Cloud Provider</CardTitle>
+        </CardHeader>
+        <CardContent className="flex gap-4">
+          {cloudProviders.map((provider) => (
+            <Button
+              key={provider}
+              variant={selectedProvider === provider ? 'secondary' : 'outline'}
+              onClick={() => handleProviderSelect(provider)}
+            >
+              {provider}
+            </Button>
+          ))}
+        </CardContent>
+      </Card>
+      {selectedProvider && <CloudScanResults selectedProvider={selectedProvider} />}
+    </>
   );
 };
-
