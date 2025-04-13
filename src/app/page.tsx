@@ -12,12 +12,15 @@ const LoginPage = () => {
   const [loggedIn, setLoggedIn] = useState(false);
   const { toast } = useToast();
 
-  const handleGoogleLogin = () => {
+  const handleGoogleLogin = async () => {
+    // Simulate Google Login
+    // In a real application, you would use Supabase or similar for actual OAuth
+    await new Promise((resolve) => setTimeout(resolve, 500)); // Simulate network request
     toast({
-      title: "Login with Google not implemented",
-      description: "This functionality is under development.",
+      title: "Login with Google (Simulated)",
+      description: "Successfully logged in with Google.",
     });
-    console.log("Logging in with Google");
+    setLoggedIn(true);
   };
 
   const handleGuestLogin = () => {
@@ -56,3 +59,4 @@ const LoginPage = () => {
 
 export default LoginPage;
 
+    
