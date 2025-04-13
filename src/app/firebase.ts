@@ -13,6 +13,10 @@ const firebaseConfig = {
   appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID
 };
 
+if (!firebaseConfig.apiKey) {
+  throw new Error("NEXT_PUBLIC_FIREBASE_API_KEY environment variable is missing.  Please add it to your .env file.");
+}
+
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);
 export const auth = getAuth(app);
