@@ -40,10 +40,11 @@ const LoginPage = () => {
         description: "Successfully logged in with Google.",
       });
     } catch (error: any) {
+      console.error("Google Login Error:", error); // Log the error for debugging
       toast({
         variant: "destructive",
-        title: "Error logging in",
-        description: error.message,
+        title: "Error logging in with Google",
+        description: error.message || "An unexpected error occurred during Google login.",
       });
     } finally {
       setLoading(false);
@@ -60,10 +61,11 @@ const LoginPage = () => {
         description: "Successfully logged in as guest.",
       });
     } catch (error: any) {
+      console.error("Guest Login Error:", error); // Log the error for debugging
       toast({
         variant: "destructive",
         title: "Error logging in as guest",
-        description: error.message,
+        description: error.message || "An unexpected error occurred during guest login.",
       });
     } finally {
       setLoading(false);
