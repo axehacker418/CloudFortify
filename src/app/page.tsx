@@ -6,14 +6,18 @@ import { Toaster } from "@/components/ui/toaster";
 import { useState } from "react";
 import { Dashboard } from "@/components/dashboard/dashboard";
 import { SidebarProvider } from "@/components/ui/sidebar";
+import { useToast } from "@/hooks/use-toast";
 
 const LoginPage = () => {
   const [loggedIn, setLoggedIn] = useState(false);
+  const { toast } = useToast();
 
   const handleGoogleLogin = () => {
-    // TODO: Implement Google OAuth login functionality
+    toast({
+      title: "Login with Google not implemented",
+      description: "This functionality is under development.",
+    });
     console.log("Logging in with Google");
-    setLoggedIn(true);
   };
 
   const handleGuestLogin = () => {
@@ -51,3 +55,4 @@ const LoginPage = () => {
 };
 
 export default LoginPage;
+
