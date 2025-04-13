@@ -1,33 +1,79 @@
+
 "use client";
 
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Toaster } from "@/components/ui/toaster";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Dashboard } from "@/components/dashboard/dashboard";
 import { SidebarProvider } from "@/components/ui/sidebar";
 import { useToast } from "@/hooks/use-toast";
+import { auth, signInGuest } from "./firebase";
+import { GoogleAuthProvider, signInWithPopup } from "firebase/auth";
 
 const LoginPage = () => {
   const [loggedIn, setLoggedIn] = useState(false);
   const { toast } = useToast();
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const unsubscribe = auth.onAuthStateChanged(user => {
+      setLoading(false);
+      if (user) {
+        setLoggedIn(true);
+      } else {
+        setLoggedIn(false);
+      }
+    });
+    return () => unsubscribe();
+  }, []);
 
   const handleGoogleLogin = async () => {
-    // Simulate Google Login
-    // In a real application, you would use Supabase or similar for actual OAuth
-    await new Promise((resolve) => setTimeout(resolve, 500)); // Simulate network request
-    toast({
-      title: "Login with Google (Simulated)",
-      description: "Successfully logged in with Google.",
-    });
-    setLoggedIn(true);
+    setLoading(true);
+    try {
+      const provider = new GoogleAuthProvider();
+      const result = await signInWithPopup(auth, provider);
+      // const credential = GoogleAuthProvider.credentialFromResult(result);
+      // const token = credential?.accessToken;
+      setLoggedIn(true);
+      toast({
+        title: "Login with Google",
+        description: "Successfully logged in with Google.",
+      });
+    } catch (error: any) {
+      toast({
+        variant: "destructive",
+        title: "Error logging in",
+        description: error.message,
+      });
+    } finally {
+      setLoading(false);
+    }
   };
 
-  const handleGuestLogin = () => {
-    // TODO: Implement guest login functionality
-    console.log("Continuing as Guest");
-    setLoggedIn(true);
+  const handleGuestLogin = async () => {
+    setLoading(true);
+    try {
+      await signInGuest();
+      setLoggedIn(true);
+      toast({
+        title: "Continue as Guest",
+        description: "Successfully logged in as guest.",
+      });
+    } catch (error: any) {
+      toast({
+        variant: "destructive",
+        title: "Error logging in as guest",
+        description: error.message,
+      });
+    } finally {
+      setLoading(false);
+    }
   };
+
+  if (loading) {
+    return <div className="flex items-center justify-center h-screen bg-secondary">Loading...</div>;
+  }
 
   if (loggedIn) {
     return (
@@ -58,5 +104,3 @@ const LoginPage = () => {
 };
 
 export default LoginPage;
-
-    

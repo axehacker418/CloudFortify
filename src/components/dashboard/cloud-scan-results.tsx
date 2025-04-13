@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useEffect, useState } from 'react';
@@ -17,6 +18,8 @@ import {
   GcpSecurityScanResult,
   getGcpSecurityScanResults,
 } from '@/services/gcp';
+import { suggestRemediation, SuggestRemediationOutput } from '@/ai/flows/suggest-remediation';
+import { Button } from '@/components/ui/button';
 
 interface CloudScanResultsProps {
   selectedProvider: string;
@@ -28,6 +31,7 @@ export const CloudScanResults = ({ selectedProvider }: CloudScanResultsProps) =>
   >(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [remediationSuggestions, setRemediationSuggestions] = useState<string[]>([]);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -37,14 +41,12 @@ export const CloudScanResults = ({ selectedProvider }: CloudScanResultsProps) =>
       try {
         switch (selectedProvider) {
           case 'AWS': {
-            // Replace with your actual AWS configuration
             const awsConfig: AwsConfiguration = { region: 'us-west-2', accountId: '123456789012' };
             const data = await getAwsSecurityScanResults(awsConfig);
             setSecurityData(data);
             break;
           }
           case 'Azure': {
-            // Replace with your actual Azure configuration
             const azureConfig: AzureConfiguration = {
               subscriptionId: 'your-subscription-id',
               resourceGroup: 'your-resource-group',
@@ -54,7 +56,6 @@ export const CloudScanResults = ({ selectedProvider }: CloudScanResultsProps) =>
             break;
           }
           case 'GCP': {
-            // Replace with your actual GCP configuration
             const gcpConfig: GcpConfiguration = { projectId: 'your-project-id', zone: 'us-central1-a' };
             const data = await getGcpSecurityScanResults(gcpConfig);
             setSecurityData(data);
@@ -65,7 +66,7 @@ export const CloudScanResults = ({ selectedProvider }: CloudScanResultsProps) =>
         }
       } catch (err: any) {
         setError(err.message || 'Failed to fetch security scan results');
-        setSecurityData(null); // Clear any previous data
+        setSecurityData(null);
       } finally {
         setLoading(false);
       }
@@ -73,6 +74,27 @@ export const CloudScanResults = ({ selectedProvider }: CloudScanResultsProps) =>
 
     fetchData();
   }, [selectedProvider]);
+
+  useEffect(() => {
+    const fetchRemediationSuggestions = async () => {
+      if (securityData && securityData.securityAlerts && securityData.securityAlerts.length > 0) {
+        try {
+          const remediationResult: SuggestRemediationOutput = await suggestRemediation({
+            securityAlerts: securityData.securityAlerts,
+            cloudProvider: selectedProvider as 'AWS' | 'Azure' | 'GCP',
+          });
+          setRemediationSuggestions(remediationResult.remediationSuggestions);
+        } catch (err: any) {
+          setError(err.message || 'Failed to fetch remediation suggestions');
+          setRemediationSuggestions([]);
+        }
+      } else {
+        setRemediationSuggestions([]);
+      }
+    };
+
+    fetchRemediationSuggestions();
+  }, [securityData, selectedProvider]);
 
   if (!selectedProvider) {
     return <Card className="w-full p-4">
@@ -114,6 +136,19 @@ export const CloudScanResults = ({ selectedProvider }: CloudScanResultsProps) =>
           </>
         ) : (
           <p>No security alerts found.</p>
+        )}
+
+        {remediationSuggestions && remediationSuggestions.length > 0 ? (
+          <>
+            <p>Remediation Suggestions:</p>
+            <ul>
+              {remediationSuggestions.map((suggestion, index) => (
+                <li key={index}>{suggestion}</li>
+              ))}
+            </ul>
+          </>
+        ) : (
+          <p>No remediation suggestions found.</p>
         )}
       </CardContent>
     </Card>
