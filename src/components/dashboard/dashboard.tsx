@@ -9,7 +9,7 @@ import { Help } from './help';
 export const Dashboard = () => {
   return (
     <div className="flex flex-col h-screen">
-      <Tabs defaultvalue="scan" className="w-full">
+      <Tabs defaultValue="scan" className="w-full">
         <TabsList className="grid w-full grid-cols-4">
           <TabsTrigger value="scan">Scan</TabsTrigger>
           <TabsTrigger value="remediation">Remediation</TabsTrigger>
@@ -32,3 +32,4 @@ export const Dashboard = () => {
     </div>
   );
 };
+
