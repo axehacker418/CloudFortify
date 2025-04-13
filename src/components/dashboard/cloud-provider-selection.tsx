@@ -1,6 +1,6 @@
 "use client";
 
-import {useState} from 'react';
+import {useCallback, useState} from 'react';
 import {Card, CardContent, CardHeader, CardTitle} from '@/components/ui/card';
 import {Button} from '@/components/ui/button';
 
@@ -9,9 +9,9 @@ const cloudProviders = ['AWS', 'Azure', 'GCP'];
 export const CloudProviderSelection = () => {
   const [selectedProvider, setSelectedProvider] = useState<string | null>(null);
 
-  const handleProviderSelect = (provider: string) => {
-    setSelectedProvider(provider);
-  };
+  const handleProviderSelect = useCallback((provider: string) => {
+    setSelectedProvider((prevProvider) => (prevProvider === provider ? null : provider));
+  }, []);
 
   return (
     <Card className="w-full p-4">
@@ -32,3 +32,4 @@ export const CloudProviderSelection = () => {
     </Card>
   );
 };
+
