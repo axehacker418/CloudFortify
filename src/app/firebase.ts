@@ -1,4 +1,3 @@
-
 // Import the functions you need from the SDKs you need
 import { initializeApp } from "firebase/app";
 import { getAuth, signInAnonymously } from "firebase/auth";
@@ -13,8 +12,17 @@ const firebaseConfig = {
   appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID
 };
 
-if (!firebaseConfig.apiKey) {
-  throw new Error("NEXT_PUBLIC_FIREBASE_API_KEY environment variable is missing.  Please add it to your .env file.");
+// Check if any of the required environment variables are missing
+const missingConfigValues: string[] = [];
+if (!firebaseConfig.apiKey) missingConfigValues.push("NEXT_PUBLIC_FIREBASE_API_KEY");
+if (!firebaseConfig.authDomain) missingConfigValues.push("NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN");
+if (!firebaseConfig.projectId) missingConfigValues.push("NEXT_PUBLIC_FIREBASE_PROJECT_ID");
+if (!firebaseConfig.appId) missingConfigValues.push("NEXT_PUBLIC_FIREBASE_APP_ID");
+
+if (missingConfigValues.length > 0) {
+  throw new Error(
+    `Missing Firebase configuration values in environment variables: ${missingConfigValues.join(", ")}.  Please add them to your .env file.`
+  );
 }
 
 // Initialize Firebase

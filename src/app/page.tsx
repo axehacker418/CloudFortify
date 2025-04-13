@@ -1,18 +1,24 @@
 "use client";
 
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Toaster } from "@/components/ui/toaster";
-import { useState, useEffect } from "react";
-import { Dashboard } from "@/components/dashboard/dashboard";
-import { SidebarProvider } from "@/components/ui/sidebar";
-import { useToast } from "@/hooks/use-toast";
-import { auth, signInGuest } from "./firebase";
-import { GoogleAuthProvider, signInWithPopup } from "firebase/auth";
+import {Button} from "@/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import {Toaster} from "@/components/ui/toaster";
+import {useState, useEffect} from "react";
+import {Dashboard} from "@/components/dashboard/dashboard";
+import {SidebarProvider} from "@/components/ui/sidebar";
+import {useToast} from "@/hooks/use-toast";
+import {auth, signInGuest} from "./firebase";
+import {GoogleAuthProvider, signInWithPopup} from "firebase/auth";
 
 const LoginPage = () => {
   const [loggedIn, setLoggedIn] = useState(false);
-  const { toast } = useToast();
+  const {toast} = useToast();
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -32,19 +38,32 @@ const LoginPage = () => {
     try {
       const provider = new GoogleAuthProvider();
       const result = await signInWithPopup(auth, provider);
-      // const credential = GoogleAuthProvider.credentialFromResult(result);
-      // const token = credential?.accessToken;
+      // The signed-in user info.
+      const user = result.user;
+      console.log("Google Login success:", user);
       setLoggedIn(true);
       toast({
         title: "Login with Google",
         description: "Successfully logged in with Google.",
       });
     } catch (error: any) {
-      console.error("Google Login Error:", error); // Log the error for debugging
+      // Handle Errors here.
+      const errorCode = error.code;
+      const errorMessage = error.message;
+      // The email of the user's account used.
+      const email = error.email;
+      // The AuthCredential type that was used.
+      const credential = GoogleAuthProvider.credentialFromError(error);
+      console.error("Google Login Error:", {
+        errorCode,
+        errorMessage,
+        email,
+        credential,
+      }); // Enhanced error logging
       toast({
         variant: "destructive",
         title: "Error logging in with Google",
-        description: error.message || "An unexpected error occurred during Google login.",
+        description: errorMessage || "An unexpected error occurred.",
       });
     } finally {
       setLoading(false);
@@ -54,7 +73,9 @@ const LoginPage = () => {
   const handleGuestLogin = async () => {
     setLoading(true);
     try {
-      await signInGuest();
+      const userCredential = await signInGuest();
+      const user = userCredential.user;
+      console.log("Signed in as guest:", user.uid);
       setLoggedIn(true);
       toast({
         title: "Continue as Guest",
